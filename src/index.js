@@ -1,18 +1,10 @@
 import axios from 'axios';
-import express from 'express'
-import cors from 'cors'
+import express from 'express';
+import cors from 'cors';
+import _ from 'lodash';
 
-async function getAtalayaHotels() {
-  return axios.get('http://www.mocky.io/v2/5e4a7e4f2f00005d0097d253');
-}
-
-async function getAtalayaRooms() {
-  return axios.get('https://run.mocky.io/v3/132af02e-8beb-438f-ac6e-a9902bc67036');
-}
-
-async function getAtalayaMealPlans() {
-  return axios.get('http://www.mocky.io/v2/5e4a7e282f0000490097d252');
-}
+import getAtalayaHotelsData from './atalaya.js';
+import getResortHotelsData from './resort.js';
 
 const app = express();
 
@@ -25,15 +17,19 @@ app.listen(3000, () => {
 
 app.get('/hotelList', async (req, res) => {
   try {
-    let { data: hotels } = await getAtalayaHotels();
-    let { data: rooms } = await getAtalayaRooms();
-    let { data: mealPlans } = await getAtalayaMealPlans();
+    //Se obtienen los datos de los Hoteles Atayala
+    const atalayaHotels = await getAtalayaHotelsData();
+    //Se obtienen los datos de los Hoteles Resort
+    const resortHotels = await getResortHotelsData();
+    //Se concatenan ambos resultados
+    const allHotels = _.concat(atalayaHotels, resortHotels);
+    //Se devuelve la respuesta
+    const response = { hotels: allHotels };
+    res.json(response);
 
-    console.log(hotels);
-    console.log(rooms);
-    console.log(mealPlans);
 
   } catch (error) {
     console.error(error);
   }
 });
+ 
